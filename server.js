@@ -1,22 +1,41 @@
 const express = require('express');
-
+const path = require('path');
+const hbs = require('express-handlebars');
 const app = express();
 
+app.set('view engine', '.hbs');
+app.set('views', path.join(__dirname, 'views'));
+app.engine('.hbs', hbs.engine());
+
+app.use('/admin', (req, res, next) => {
+    if(isAdmin()) next();
+    else res.send('Go away!');
+});
+
+app.use(express.static(path.join(__dirname, '/public')));
+
 app.get('/', (req, res) => {
-    res.send('<h1>My first server!</h1>');
+    res.render('index' );
 });
 app.get('/about', (req, res) => {
-    res.send('<h1>About</h1>');
+    res.render('about', { layout: 'dark' } );
 });
 app.get('/contact', (req, res) => {
-    res.send('<h1>Contact</h1>');
+    res.render('contact' );
 });
 app.get('/info', (req, res) => {
-    res.send('<h1>Info</h1>');
+    res.render('info' );
 });
 app.get('/history', (req, res) => {
-    res.send('<h1>History</h1>');
+    res.render('history' );
+});
+app.get('/hello/:name', (req, res) => {
+    res.render('hello' );
 });
 app.listen(8000, () => {
     console.log('Server is running on port: 8000');
 });
+
+app.use((req, res) => {
+    res.status(404).send('404 not found...');
+})
