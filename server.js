@@ -6,14 +6,17 @@ const app = express();
 
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
-        cb(null, 'uploads')
+        cb(null, 'public/uploads')
     },
     filename: (req, file, cb) => {
         cb(null, file.originalname)
     }
 })
 const upload = multer({ storage: storage })
-
+const isAdmin = () => {
+    // TO_DO Check if user is admin
+    return false
+}
 app.set('view engine', '.hbs');
 app.set('views', path.join(__dirname, 'views'));
 app.engine('.hbs', hbs.engine());
@@ -48,7 +51,9 @@ app.get('/hello/:name', (req, res) => {
 app.post('/contact/send-message', upload.single('project'), (req, res) => {
     const { author, sender, title, message } = req.body;
     if(author && sender && title && message && req.file) {
-        res.render('contact', { isSent: true, fileName: req.file.filename });
+        res.render('contact', { isSent: true,
+            fileName: req.file.filename,
+            fileSource:  path.join('public/uploads', req.file.filename)});
     }
     else {
         res.render('contact', { isError: true });
